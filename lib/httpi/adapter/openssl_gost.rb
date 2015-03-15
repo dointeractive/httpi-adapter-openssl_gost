@@ -22,7 +22,7 @@ module HTTPI
 
       def request(method)
         uri = @request.url
-        cmd = "openssl s_client -engine gost -connect '#{uri.host}:#{uri.port}' -quiet"
+        cmd = "openssl s_client -connect '#{uri.host}:#{uri.port}' -quiet"
         cmd += " -cert '#{pubkey_path}'"    if pubkey_path
         cmd += " -key '#{privkey_path}'"    if privkey_path
         cmd += " -CAfile '#{cacert_path}'"  if cacert_path
@@ -34,6 +34,9 @@ module HTTPI
         if @request.body and !@request.headers['Content-Length']
           headers += "Content-Length: #{@request.body.bytesize}\r\n"
         end
+
+        headers << "Content-Type: application/x-www-form-urlencoded; Charset=utf-8\r\n"
+
         # Add hostname header and explicitly close connection (we need command to exit immediately)
         headers += "Host: #{uri.host}\r\nConnection: close\r\n\r\n"
         req += headers
